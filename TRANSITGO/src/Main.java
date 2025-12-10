@@ -11,7 +11,8 @@ public class Main {
     SortingAlgorithm sortingAlgo = new SortingAlgorithm();
     
     public void run() {
-        DataKota.inisialisasiSemua(kotaGrid, graphMRT, graphBus, GRID_SIZE);
+        DataKota data = new DataKota();
+        data.inisialisasiSemua(kotaGrid, graphMRT, graphBus, GRID_SIZE);
         TampilanUI.tampilkanWelcome();
         boolean running = true;
         
