@@ -1,20 +1,20 @@
 import java.util.Scanner;
 
 public class Main {
-    static final int GRID_SIZE = 10;
-    static Zona[][] kotaGrid = new Zona[GRID_SIZE][GRID_SIZE];
-    static GraphTransportasi graphMRT = new GraphTransportasi("MRT", GRID_SIZE);
-    static GraphTransportasi graphBus = new GraphTransportasi("Bus", GRID_SIZE);
-    static StackRiwayat riwayatPencarian = new StackRiwayat();
-    static HasilRute[] hasilRute = new HasilRute[20];
-    static int jumlahHasil = 0;
-    static Scanner scanner = new Scanner(System.in);
-    static SortingAlgorithm sortingAlgo = new SortingAlgorithm();
+    int GRID_SIZE = 10;
+    Zona[][] kotaGrid = new Zona[GRID_SIZE][GRID_SIZE];
+    GraphTransportasi graphMRT = new GraphTransportasi("MRT", GRID_SIZE);
+    GraphTransportasi graphBus = new GraphTransportasi("Bus", GRID_SIZE);
+    StackRiwayat riwayatPencarian = new StackRiwayat();
+    HasilRuteNode hasilRuteHead = null;
+    Scanner scanner = new Scanner(System.in);
+    SortingAlgorithm sortingAlgo = new SortingAlgorithm();
     
-    public static void main(String[] args) {
+    public void run() {
         DataKota.inisialisasiSemua(kotaGrid, graphMRT, graphBus, GRID_SIZE);
         TampilanUI.tampilkanWelcome();
         boolean running = true;
+        
         while (running) {
             TampilanUI.tampilkanMenuUtama();
             int pilihan = inputAngka("Pilih menu: ");
@@ -33,15 +33,16 @@ public class Main {
                 default: TampilanUI.tampilkanError("Menu tidak valid! Pilih 0-9.");
             }
         }
+        
         TampilanUI.tampilkanGoodbye();
         scanner.close();
     }
     
-    static void menuPetaKota() {
+    void menuPetaKota() {
         TampilanUI.tampilkanPetaKota(kotaGrid, graphMRT, graphBus, GRID_SIZE);
     }
     
-    static void menuCariTempat() {
+    void menuCariTempat() {
         TampilanUI.tampilkanHeaderCariTempat();
         int pilihan = inputAngka("Pilih metode pencarian (1/2): ");
         System.out.print("Masukkan keyword pencarian: ");
@@ -62,7 +63,7 @@ public class Main {
         TampilanUI.tampilkanHasilPencarianFooter(ditemukan);
     }
     
-    static void menuCariRute() {
+    void menuCariRute() {
         TampilanUI.tampilkanHeaderCariRute();
         
         System.out.println("\n>> Masukkan lokasi ASAL:");
@@ -99,10 +100,11 @@ public class Main {
         if (algoritma < 1 || algoritma > 3) algoritma = 1;
         
         System.out.println("\n>> Mencari rute dengan BFS...");
-        jumlahHasil = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
+        hasilRuteHead = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
                                                      asalBaris, asalKolom,
-                                                     tujuanBaris, tujuanKolom,
-                                                     hasilRute);
+                                                     tujuanBaris, tujuanKolom);
+        
+        int jumlahHasil = countNodes(hasilRuteHead);
         
         String[] namaAlgoritma = {"", "Bubble Sort", "Selection Sort", "Insertion Sort"};
         String[] namaKriteria = {"", "Waktu", "Harga", "Transit"};
@@ -110,19 +112,19 @@ public class Main {
         System.out.println(">> Mengurutkan dengan " + namaAlgoritma[algoritma] + 
                           " berdasarkan " + namaKriteria[kriteria] + "...");
         
-        HasilRuteNode head = arrayToLinkedList(hasilRute, jumlahHasil);
-        head = sortingAlgo.sortHasil(head, algoritma, kriteria);
-        linkedListToArray(head, hasilRute);
+        hasilRuteHead = sortingAlgo.sortHasil(hasilRuteHead, algoritma, kriteria);
         
-        TampilanUI.tampilkanHasilRute(hasilRute, jumlahHasil,
+        HasilRute[] hasilRuteArray = linkedListToArray(hasilRuteHead, jumlahHasil);
+        
+        TampilanUI.tampilkanHasilRute(hasilRuteArray, jumlahHasil,
                                       asalBaris, asalKolom, tujuanBaris, tujuanKolom);
     }
     
-    static void menuRiwayat() {
+    void menuRiwayat() {
         TampilanUI.tampilkanRiwayat(riwayatPencarian);
     }
     
-    static void menuDetailZona() {
+    void menuDetailZona() {
         TampilanUI.tampilkanHeaderDetailZona();
         int baris = inputAngka("Masukkan baris zona (0-9): ");
         int kolom = inputAngka("Masukkan kolom zona (0-9): ");
@@ -135,7 +137,7 @@ public class Main {
         TampilanUI.tampilkanDetailZona(kotaGrid[baris][kolom], graphMRT, graphBus);
     }
     
-    static void menuJaringanTransportasi() {
+    void menuJaringanTransportasi() {
         TampilanUI.tampilkanHeaderJaringan();
         int pilihan = inputAngka("Pilih (1/2/3): ");
         
@@ -148,7 +150,7 @@ public class Main {
         }
     }
     
-    static void menuTambahTempat() {
+    void menuTambahTempat() {
         TampilanUI.tampilkanHeaderTambahTempat();
         int baris = inputAngka("Masukkan baris zona (0-9): ");
         int kolom = inputAngka("Masukkan kolom zona (0-9): ");
@@ -179,7 +181,7 @@ public class Main {
         TampilanUI.tampilkanKonfirmasiTambah(nama, baris, kolom, kotaGrid[baris][kolom].namaZona);
     }
     
-    static void menuDemoSearching() {
+    void menuDemoSearching() {
         System.out.println();
         System.out.println("╔════════════════════════════════════════════════════════╗");
         System.out.println("║              DEMO ALGORITMA SEARCHING                  ║");
@@ -199,7 +201,7 @@ public class Main {
         }
     }
     
-    static void demoLinearSearchTempat() {
+    void demoLinearSearchTempat() {
         System.out.println("\n═══ LINEAR SEARCH - Linked List Traversal ═══");
         System.out.println("Kompleksitas: O(n) dimana n = total tempat");
         System.out.println();
@@ -223,7 +225,7 @@ public class Main {
         TampilanUI.tampilkanHasilPencarianFooter(ditemukan);
     }
     
-    static void demoLinearSearchZona() {
+    void demoLinearSearchZona() {
         System.out.println("\n═══ LINEAR SEARCH - Array 2D ═══");
         System.out.println("Kompleksitas: O(n²) dimana n = GRID_SIZE");
         System.out.println();
@@ -270,8 +272,8 @@ public class Main {
         }
         System.out.println("└────────────────────────────────────────────────────────────────┘");
     }
-    s
-    static void demoBinarySearch() {
+    
+    void demoBinarySearch() {
         System.out.println("\n═══ BINARY SEARCH - Sorted Array ═══");
         System.out.println("Kompleksitas: O(log n)");
         System.out.println("SYARAT: Array harus sudah TERURUT!");
@@ -293,8 +295,11 @@ public class Main {
             return;
         }
         
-        jumlahHasil = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
-        asalBaris, asalKolom,tujuanBaris, tujuanKolom,hasilRute);
+        hasilRuteHead = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
+                                                   asalBaris, asalKolom,
+                                                   tujuanBaris, tujuanKolom);
+        
+        int jumlahHasil = countNodes(hasilRuteHead);
         
         if (jumlahHasil == 0) {
             TampilanUI.tampilkanError("Tidak ada rute ditemukan. Coba koordinat lain.");
@@ -302,15 +307,15 @@ public class Main {
         }
         
         System.out.println("\n>> Mengurutkan hasil dengan Bubble Sort by Waktu...");
-        HasilRuteNode head = arrayToLinkedList(hasilRute, jumlahHasil);
-        sortingAlgo.bubbleSortByWaktu(head);
-        linkedListToArray(head, hasilRute);
+        sortingAlgo.bubbleSortByWaktu(hasilRuteHead);
+        
+        HasilRute[] hasilRuteArray = linkedListToArray(hasilRuteHead, jumlahHasil);
         
         System.out.println("\n>> Data rute (sudah terurut by waktu):");
         for (int i = 0; i < jumlahHasil; i++) {
             System.out.printf("   Index %d: %s - %d menit - %s%n", 
-                             i, hasilRute[i].moda, hasilRute[i].totalWaktu,
-                             hasilRute[i].getHargaFormatted());
+                             i, hasilRuteArray[i].moda, hasilRuteArray[i].totalWaktu,
+                             hasilRuteArray[i].getHargaFormatted());
         }
         
         System.out.println();
@@ -319,15 +324,15 @@ public class Main {
         System.out.println("\n>> Proses Binary Search:");
         System.out.println("   - left = 0, right = " + (jumlahHasil - 1));
         
-        int hasil = PencarianService.binarySearchRuteByWaktu(hasilRute, jumlahHasil, targetWaktu);
+        HasilRuteNode hasilNode = PencarianService.binarySearchRuteByWaktu(hasilRuteHead, targetWaktu);
         
         System.out.println();
-        if (hasil != -1) {
+        if (hasilNode != null) {
             System.out.println("┌────────────────────────────────────────────────────────────────┐");
-            System.out.println("│  [✓] DITEMUKAN di index " + hasil);
-            System.out.printf("│      Moda  : %s%n", hasilRute[hasil].moda);
-            System.out.printf("│      Waktu : %d menit%n", hasilRute[hasil].totalWaktu);
-            System.out.printf("│      Harga : %s%n", hasilRute[hasil].getHargaFormatted());
+            System.out.println("│  [✓] DITEMUKAN!");
+            System.out.printf("│      Moda  : %s%n", hasilNode.data.moda);
+            System.out.printf("│      Waktu : %d menit%n", hasilNode.data.totalWaktu);
+            System.out.printf("│      Harga : %s%n", hasilNode.data.getHargaFormatted());
             System.out.println("└────────────────────────────────────────────────────────────────┘");
         } else {
             System.out.println("┌────────────────────────────────────────────────────────────────┐");
@@ -336,7 +341,7 @@ public class Main {
         }
     }
     
-    static void menuDemoSorting() {
+    void menuDemoSorting() {
         System.out.println();
         System.out.println("╔════════════════════════════════════════════════════════╗");
         System.out.println("║               DEMO ALGORITMA SORTING                   ║");
@@ -363,8 +368,11 @@ public class Main {
             return;
         }
         
-        jumlahHasil = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
-        asalBaris, asalKolom, tujuanBaris, tujuanKolom, hasilRute);
+        HasilRuteNode originalHead = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
+                                                                 asalBaris, asalKolom,
+                                                                 tujuanBaris, tujuanKolom);
+        
+        int jumlahHasil = countNodes(originalHead);
         
         if (jumlahHasil == 0) {
             TampilanUI.tampilkanError("Tidak ada rute ditemukan. Coba koordinat lain.");
@@ -380,13 +388,15 @@ public class Main {
         
         String[] namaKriteria = {"", "Waktu", "Harga", "Transit"};
         
+        HasilRute[] hasilRuteArray = linkedListToArray(originalHead, jumlahHasil);
+        
         System.out.println("\n┌────────────────────────────────────────────────────────────────┐");
         System.out.println("│  DATA SEBELUM SORTING:                                         │");
         System.out.println("├────────────────────────────────────────────────────────────────┤");
         for (int i = 0; i < jumlahHasil; i++) {
             System.out.printf("│  %d. %s - Waktu: %d mnt, Harga: %s, Transit: %d%n",
-                             i+1, hasilRute[i].moda, hasilRute[i].totalWaktu,
-                             hasilRute[i].getHargaFormatted(), hasilRute[i].jumlahTransit);
+                             i+1, hasilRuteArray[i].moda, hasilRuteArray[i].totalWaktu,
+                             hasilRuteArray[i].getHargaFormatted(), hasilRuteArray[i].jumlahTransit);
         }
         System.out.println("└────────────────────────────────────────────────────────────────┘");
         
@@ -395,36 +405,33 @@ public class Main {
         System.out.println("                  Kriteria: " + namaKriteria[kriteria]);
         System.out.println("═══════════════════════════════════════════════════════════════");
         
-        HasilRute[] copyBubble = copyArray(hasilRute, jumlahHasil);
-        HasilRute[] copySelection = copyArray(hasilRute, jumlahHasil);
-        HasilRute[] copyInsertion = copyArray(hasilRute, jumlahHasil);
+        HasilRuteNode copyBubble = copyLinkedList(originalHead);
+        HasilRuteNode copySelection = copyLinkedList(originalHead);
+        HasilRuteNode copyInsertion = copyLinkedList(originalHead);
         
         System.out.println("\n>> BUBBLE SORT");
         System.out.println("   Cara kerja: Bandingkan elemen bersebelahan, tukar jika salah urutan");
-        HasilRuteNode headBubble = arrayToLinkedList(copyBubble, jumlahHasil);
-        if (kriteria == 1) sortingAlgo.bubbleSortByWaktu(headBubble);
-        else if (kriteria == 2) sortingAlgo.bubbleSortByHarga(headBubble);
-        else sortingAlgo.bubbleSortByTransit(headBubble);
-        linkedListToArray(headBubble, copyBubble);
-        tampilkanHasilSort(copyBubble, jumlahHasil);
+        if (kriteria == 1) sortingAlgo.bubbleSortByWaktu(copyBubble);
+        else if (kriteria == 2) sortingAlgo.bubbleSortByHarga(copyBubble);
+        else sortingAlgo.bubbleSortByTransit(copyBubble);
+        HasilRute[] arrayBubble = linkedListToArray(copyBubble, jumlahHasil);
+        tampilkanHasilSort(arrayBubble, jumlahHasil);
         
         System.out.println("\n>> SELECTION SORT");
         System.out.println("   Cara kerja: Cari minimum, pindahkan ke posisi awal, ulangi");
-        HasilRuteNode headSelection = arrayToLinkedList(copySelection, jumlahHasil);
-        if (kriteria == 1) headSelection = sortingAlgo.selectionSortByWaktu(headSelection);
-        else if (kriteria == 2) headSelection = sortingAlgo.selectionSortByHarga(headSelection);
-        else headSelection = sortingAlgo.selectionSortByTransit(headSelection);
-        linkedListToArray(headSelection, copySelection);
-        tampilkanHasilSort(copySelection, jumlahHasil);
+        if (kriteria == 1) copySelection = sortingAlgo.selectionSortByWaktu(copySelection);
+        else if (kriteria == 2) copySelection = sortingAlgo.selectionSortByHarga(copySelection);
+        else copySelection = sortingAlgo.selectionSortByTransit(copySelection);
+        HasilRute[] arraySelection = linkedListToArray(copySelection, jumlahHasil);
+        tampilkanHasilSort(arraySelection, jumlahHasil);
         
         System.out.println("\n>> INSERTION SORT");
         System.out.println("   Cara kerja: Ambil elemen, sisipkan di posisi yang tepat");
-        HasilRuteNode headInsertion = arrayToLinkedList(copyInsertion, jumlahHasil);
-        if (kriteria == 1) headInsertion = sortingAlgo.insertionSortByWaktu(headInsertion);
-        else if (kriteria == 2) headInsertion = sortingAlgo.insertionSortByHarga(headInsertion);
-        else headInsertion = sortingAlgo.insertionSortByTransit(headInsertion);
-        linkedListToArray(headInsertion, copyInsertion);
-        tampilkanHasilSort(copyInsertion, jumlahHasil);
+        if (kriteria == 1) copyInsertion = sortingAlgo.insertionSortByWaktu(copyInsertion);
+        else if (kriteria == 2) copyInsertion = sortingAlgo.insertionSortByHarga(copyInsertion);
+        else copyInsertion = sortingAlgo.insertionSortByTransit(copyInsertion);
+        HasilRute[] arrayInsertion = linkedListToArray(copyInsertion, jumlahHasil);
+        tampilkanHasilSort(arrayInsertion, jumlahHasil);
         
         System.out.println("\n═══════════════════════════════════════════════════════════════");
         System.out.println("   Semua algoritma menghasilkan urutan yang SAMA!");
@@ -432,17 +439,51 @@ public class Main {
         System.out.println("═══════════════════════════════════════════════════════════════");
     }
     
-    static HasilRute[] copyArray(HasilRute[] source, int length) {
-        HasilRute[] copy = new HasilRute[length];
-        for (int i = 0; i < length; i++) {
-            copy[i] = new HasilRute(source[i].moda, source[i].jalur,
-                                    source[i].totalWaktu, source[i].totalHarga,
-                                    source[i].jumlahTransit);
+    HasilRuteNode copyLinkedList(HasilRuteNode head) {
+        if (head == null) return null;
+        HasilRuteNode newHead = new HasilRuteNode(new HasilRute(
+            head.data.moda, head.data.jalur, 
+            head.data.totalWaktu, head.data.totalHarga, 
+            head.data.jumlahTransit
+        ));
+        HasilRuteNode current = head.next;
+        HasilRuteNode newCurrent = newHead;
+        
+        while (current != null) {
+            newCurrent.next = new HasilRuteNode(new HasilRute(
+                current.data.moda, current.data.jalur,
+                current.data.totalWaktu, current.data.totalHarga,
+                current.data.jumlahTransit
+            ));
+            newCurrent = newCurrent.next;
+            current = current.next;
         }
-        return copy;
+        
+        return newHead;
     }
     
-    static void tampilkanHasilSort(HasilRute[] arr, int length) {
+    int countNodes(HasilRuteNode head) {
+        int count = 0;
+        HasilRuteNode current = head;
+        while (current != null) {
+            count++;
+            current = current.next;
+        }
+        return count;
+    }
+    
+    HasilRute[] linkedListToArray(HasilRuteNode head, int size) {
+        HasilRute[] array = new HasilRute[size];
+        HasilRuteNode current = head;
+        int index = 0;
+        while (current != null) {
+            array[index++] = current.data;
+            current = current.next;
+        }
+        return array;
+    }
+    
+    void tampilkanHasilSort(HasilRute[] arr, int length) {
         System.out.println("   Hasil:");
         for (int i = 0; i < length; i++) {
             System.out.printf("     %d. %s - Waktu: %d mnt, Harga: %s, Transit: %d%n",
@@ -451,27 +492,7 @@ public class Main {
         }
     }
     
-    static HasilRuteNode arrayToLinkedList(HasilRute[] array, int length) {
-        if (length == 0) return null;
-        HasilRuteNode head = new HasilRuteNode(array[0]);
-        HasilRuteNode current = head;
-        for (int i = 1; i < length; i++) {
-            current.next = new HasilRuteNode(array[i]);
-            current = current.next;
-        }
-        return head;
-    }
-    
-    static void linkedListToArray(HasilRuteNode head, HasilRute[] array) {
-        HasilRuteNode current = head;
-        int index = 0;
-        while (current != null) {
-            array[index++] = current.data;
-            current = current.next;
-        }
-    }
-    
-    static int inputAngka(String prompt) {
+    int inputAngka(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
             System.out.print("[!] Masukkan angka. " + prompt);
@@ -480,5 +501,10 @@ public class Main {
         int angka = scanner.nextInt();
         scanner.nextLine();
         return angka;
+    }
+    
+    public static void main(String[] args) {
+        Main program = new Main();
+        program.run();
     }
 }
