@@ -53,4 +53,45 @@ public class HasilRute {
     int compareToByTransit(HasilRute other) {
         return this.jumlahTransit - other.jumlahTransit;
     }
+
+    // 1. Comparator gabungan (waktu → harga → transit)
+    int compareToFull(HasilRute other) {
+        if (this.totalWaktu != other.totalWaktu)
+            return this.totalWaktu - other.totalWaktu;
+
+        if (this.totalHarga != other.totalHarga)
+            return this.totalHarga - other.totalHarga;
+
+        return this.jumlahTransit - other.jumlahTransit;
+    }
+
+    String getRuteLengkap() {
+        return "Moda: " + moda +
+               " | Jalur: " + jalur +
+               " | Waktu: " + getWaktuFormatted() +
+               " | Harga: " + getHargaFormatted() +
+               " | Transit: " + jumlahTransit + " kali";
+    }
+
+    // 3. Hitung skor efisiensi
+    double getEfisiensiScore() {
+        double wWaktu = 0.5;
+        double wHarga = 0.3;
+        double wTransit = 0.2;
+
+        return (wWaktu * totalWaktu) +
+               (wHarga * totalHarga) +
+               (wTransit * jumlahTransit);
+    }
+
+    // 4. Copy object
+    HasilRute copy() {
+        return new HasilRute(
+            this.moda,
+            this.jalur,
+            this.totalWaktu,
+            this.totalHarga,
+            this.jumlahTransit
+        );
+    }
 }
