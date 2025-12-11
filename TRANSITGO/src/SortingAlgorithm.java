@@ -310,6 +310,7 @@ public class SortingAlgorithm {
                     case 1: bubbleSortByWaktu(head); break;
                     case 2: bubbleSortByHarga(head); break;
                     case 3: bubbleSortByTransit(head); break;
+                    default: System.out.println("Error: Input tidak valid!"); break;
                 }
                 break;
             case 2:
@@ -317,6 +318,7 @@ public class SortingAlgorithm {
                     case 1: head = selectionSortByWaktu(head); break;
                     case 2: head = selectionSortByHarga(head); break;
                     case 3: head = selectionSortByTransit(head); break;
+                    default: System.out.println("Error: Input tidak valid!"); break;
                 }
                 break;
             case 3:
@@ -324,6 +326,7 @@ public class SortingAlgorithm {
                     case 1: head = insertionSortByWaktu(head); break;
                     case 2: head = insertionSortByHarga(head); break;
                     case 3: head = insertionSortByTransit(head); break;
+                    default: System.out.println("Error: Input tidak valid!"); break;
                 }
                 break;
         }

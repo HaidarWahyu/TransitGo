@@ -66,7 +66,7 @@ public class TampilanUI {
         }
         System.out.println("   ║");
         
-        // Garis atas
+        // Garis atas1
         System.out.print("║    ┌");
         for (int j = 0; j < gridSize; j++) {
             System.out.print("──────" + (j < gridSize-1 ? "┬" : "┐"));

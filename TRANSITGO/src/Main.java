@@ -31,7 +31,7 @@ public class Main {
                 case 8: menuDemoSearching(); break;
                 case 9: menuDemoSorting(); break;
                 case 0: running = false; break;
-                default: TampilanUI.tampilkanError("Menu tidak valid! Pilih 0-9.");
+                default: System.out.println("Error: Input tidak valid!"); break;
             }
         }
         
@@ -46,6 +46,12 @@ public class Main {
     void menuCariTempat() {
         TampilanUI.tampilkanHeaderCariTempat();
         int pilihan = inputAngka("Pilih metode pencarian (1/2): ");
+        
+        if (pilihan != 1 && pilihan != 2) {
+            System.out.println("Error: Input tidak valid!");
+            return;
+        }
+        
         System.out.print("Masukkan keyword pencarian: ");
         String keyword = scanner.nextLine().trim();
         
@@ -91,14 +97,20 @@ public class Main {
         System.out.println("   [2] Harga termurah");
         System.out.println("   [3] Transit tersedikit");
         int kriteria = inputAngka("   Pilih (1/2/3): ");
-        if (kriteria < 1 || kriteria > 3) kriteria = 1;
+        if (kriteria < 1 || kriteria > 3) {
+            System.out.println("Error: Input tidak valid! Menggunakan default: Waktu tercepat");
+            kriteria = 1;
+        }
         
         System.out.println("\n>> Algoritma sorting:");
         System.out.println("   [1] Bubble Sort");
         System.out.println("   [2] Selection Sort");
         System.out.println("   [3] Insertion Sort");
         int algoritma = inputAngka("   Pilih (1/2/3): ");
-        if (algoritma < 1 || algoritma > 3) algoritma = 1;
+        if (algoritma < 1 || algoritma > 3) {
+            System.out.println("Error: Input tidak valid! Menggunakan default: Bubble Sort");
+            algoritma = 1;
+        }
         
         System.out.println("\n>> Mencari rute dengan BFS...");
         hasilRuteHead = PencarianService.cariSemuaRute(graphMRT, graphBus, GRID_SIZE,
@@ -141,6 +153,11 @@ public class Main {
     void menuJaringanTransportasi() {
         TampilanUI.tampilkanHeaderJaringan();
         int pilihan = inputAngka("Pilih (1/2/3): ");
+        
+        if (pilihan != 1 && pilihan != 2 && pilihan != 3) {
+            System.out.println("Error: Input tidak valid!");
+            return;
+        }
         
         if (pilihan == 1 || pilihan == 3) {
             TampilanUI.tampilkanJaringan(graphMRT, GRID_SIZE);
@@ -198,7 +215,7 @@ public class Main {
             case 1: demoLinearSearchTempat(); break;
             case 2: demoLinearSearchZona(); break;
             case 3: demoBinarySearch(); break;
-            default: TampilanUI.tampilkanError("Pilihan tidak valid!");
+            default: System.out.println("Error: Input tidak valid!"); break;
         }
     }
     
@@ -250,7 +267,7 @@ public class Main {
         System.out.println();
         
         System.out.println("┌────────────────────────────────────────────────────────────────┐");
-        System.out.println("│  HASIL PENCARIAN ZONA: \"" + namaZona + "\"");
+        System.out.println("│  HASIL PENCARIAN ZONA: \"" + namaZona + "\"│");
         System.out.println("├────────────────────────────────────────────────────────────────┤");
         
         int count = 0;
@@ -385,7 +402,10 @@ public class Main {
         System.out.println("   [2] Harga");
         System.out.println("   [3] Transit");
         int kriteria = inputAngka("   Pilih (1/2/3): ");
-        if (kriteria < 1 || kriteria > 3) kriteria = 1;
+        if (kriteria < 1 || kriteria > 3) {
+            System.out.println("Error: Input tidak valid! Menggunakan default: Waktu");
+            kriteria = 1;
+        }
         
         String[] namaKriteria = {"", "Waktu", "Harga", "Transit"};
         
@@ -414,7 +434,11 @@ public class Main {
         System.out.println("   Cara kerja: Bandingkan elemen bersebelahan, tukar jika salah urutan");
         if (kriteria == 1) sortingAlgo.bubbleSortByWaktu(copyBubble);
         else if (kriteria == 2) sortingAlgo.bubbleSortByHarga(copyBubble);
-        else sortingAlgo.bubbleSortByTransit(copyBubble);
+        else if (kriteria == 3) sortingAlgo.bubbleSortByTransit(copyBubble);
+        else {
+            System.out.println("Error: Kriteria sorting tidak valid!");
+            return;
+        }
         HasilRute[] arrayBubble = linkedListToArray(copyBubble, jumlahHasil);
         tampilkanHasilSort(arrayBubble, jumlahHasil);
         
@@ -422,7 +446,11 @@ public class Main {
         System.out.println("   Cara kerja: Cari minimum, pindahkan ke posisi awal, ulangi");
         if (kriteria == 1) copySelection = sortingAlgo.selectionSortByWaktu(copySelection);
         else if (kriteria == 2) copySelection = sortingAlgo.selectionSortByHarga(copySelection);
-        else copySelection = sortingAlgo.selectionSortByTransit(copySelection);
+        else if (kriteria == 3) copySelection = sortingAlgo.selectionSortByTransit(copySelection);
+        else {
+            System.out.println("Error: Kriteria sorting tidak valid!");
+            return;
+        }
         HasilRute[] arraySelection = linkedListToArray(copySelection, jumlahHasil);
         tampilkanHasilSort(arraySelection, jumlahHasil);
         
@@ -430,7 +458,11 @@ public class Main {
         System.out.println("   Cara kerja: Ambil elemen, sisipkan di posisi yang tepat");
         if (kriteria == 1) copyInsertion = sortingAlgo.insertionSortByWaktu(copyInsertion);
         else if (kriteria == 2) copyInsertion = sortingAlgo.insertionSortByHarga(copyInsertion);
-        else copyInsertion = sortingAlgo.insertionSortByTransit(copyInsertion);
+        else if (kriteria == 3) copyInsertion = sortingAlgo.insertionSortByTransit(copyInsertion);
+        else {
+            System.out.println("Error: Kriteria sorting tidak valid!");
+            return;
+        }
         HasilRute[] arrayInsertion = linkedListToArray(copyInsertion, jumlahHasil);
         tampilkanHasilSort(arrayInsertion, jumlahHasil);
         
