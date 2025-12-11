@@ -59,21 +59,18 @@ public class TampilanUI {
         System.out.println("║                                   PETA KOTA 10x10                                     ║");
         System.out.println("╠═══════════════════════════════════════════════════════════════════════════════════════╣");
         
-        // Header kolom
         System.out.print("║      ");
         for (int j = 0; j < gridSize; j++) {
             System.out.printf("   %d   ", j);
         }
         System.out.println("   ║");
         
-        // Garis atas1
         System.out.print("║    ┌");
         for (int j = 0; j < gridSize; j++) {
             System.out.print("──────" + (j < gridSize-1 ? "┬" : "┐"));
         }
         System.out.println("  ║");
         
-        // Isi grid
         for (int i = 0; i < gridSize; i++) {
             System.out.printf("║  %d │", i);
             for (int j = 0; j < gridSize; j++) {
@@ -104,7 +101,7 @@ public class TampilanUI {
         System.out.println("╚═══════════════════════════════════════════════════════════════════════════════════════╝");
     }
     
-    private static String getSimbolZona(int baris, int kolom, Zona[][] kotaGrid,
+    public static String getSimbolZona(int baris, int kolom, Zona[][] kotaGrid,
     GraphTransportasi graphMRT, GraphTransportasi graphBus) {
         boolean adaMRT = graphMRT.adaKoneksi(baris, kolom);
         boolean adaBus = graphBus.adaKoneksi(baris, kolom);
